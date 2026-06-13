@@ -1,0 +1,10 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/brightpath-foundation", "destination": "https://brightpathfoundation.ca/", "permanent": true },
+    { "source": "/brightpath-foundation/:path*", "destination": "https://brightpathfoundation.ca/:path*", "permanent": true },
+    { "source": "/david-martin-website", "destination": "https://david-martin.ca/", "permanent": true },
+    { "source": "/david-martin-website/:path*", "destination": "https://david-martin.ca/:path*", "permanent": true }
+  ]
+}
