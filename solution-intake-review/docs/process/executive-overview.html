@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Custom Solution Intake & Review — Executive Process Overview</title>
+  <style>
+    :root{
+      --bg:#f8f9fb; --ink:#1a1d23; --muted:#6b7280; --line:#e2e5ea; --soft:#f1f3f6;
+      --card:#ffffff; --good:#059669; --warn:#d97706; --bad:#dc2626;
+      --accent:#4f46e5; --accent-light:#eef2ff; --radius:14px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; padding:24px;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color:var(--ink);
+      background:var(--bg);
+      line-height:1.5;
+      -webkit-font-smoothing:antialiased;
+    }
+    .wrap{ max-width:1180px; margin:0 auto; padding:0 0 40px; }
+    header{
+      border-bottom:2px solid var(--ink);
+      padding-bottom:16px;
+      margin-bottom:20px;
+    }
+    h1{ margin:0 0 8px 0; font-size:22px; font-weight:800; letter-spacing:-0.02em; }
+    .sub{ color:var(--muted); font-size:14px; max-width:105ch; line-height:1.6; }
+    .pillrow{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .pill{
+      display:inline-block;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:#fff;
+      padding:5px 12px;
+      font-size:12px;
+      font-weight:600;
+      color:var(--muted);
+      transition: all .15s ease;
+    }
+    .pill:hover{ background:var(--accent-light); border-color:var(--accent); color:var(--accent); }
+    .grid{ display:grid; grid-template-columns: repeat(12, 1fr); gap:18px; margin-top:18px; }
+    .card{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:var(--card);
+      padding:20px;
+      box-shadow:0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.03);
+      transition: box-shadow .2s ease;
+    }
+    .card:hover{ box-shadow:0 1px 3px rgba(0,0,0,.06), 0 6px 16px rgba(0,0,0,.05); }
+    .soft{ background:var(--soft); }
+    .span-12{ grid-column: span 12; }
+    .span-8{ grid-column: span 8; }
+    .span-6{ grid-column: span 6; }
+    .span-4{ grid-column: span 4; }
+    h2{ margin:2px 0 12px; font-size:16px; font-weight:700; letter-spacing:-0.01em; }
+    h3{ margin:0 0 8px; font-size:14px; font-weight:700; letter-spacing:-0.01em; }
+    p{ margin:0 0 10px; }
+    ul{ margin:8px 0 0 18px; line-height:1.7; }
+    li{ margin:4px 0; }
+    .muted{ color:var(--muted); font-size:12px; line-height:1.5; }
+    .kpi{ display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; }
+    .kpi .box{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:14px 16px;
+      background:#fff;
+      min-width:220px;
+      flex:1;
+      transition: box-shadow .15s ease;
+    }
+    .kpi .box:hover{ box-shadow:0 2px 8px rgba(0,0,0,.06); }
+    .kpi .k{ font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.04em; }
+    .kpi .v{ font-size:17px; font-weight:800; margin-top:6px; letter-spacing:-0.01em; }
+    .lane-good{ color:var(--good); font-weight:800; }
+    .lane-warn{ color:var(--warn); font-weight:800; }
+    .lane-bad{ color:var(--bad); font-weight:800; }
+    table{ width:100%; border-collapse:separate; border-spacing:0; font-size:13px; margin-top:10px; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+    th,td{ border-bottom:1px solid var(--line); padding:10px 12px; vertical-align:top; }
+    tr:last-child td{ border-bottom:none; }
+    th{ background:var(--soft); text-align:left; font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; }
+    tbody tr{ transition: background .1s ease; }
+    tbody tr:hover{ background:var(--soft); }
+    .flow{
+      display:grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap:12px;
+      margin-top:12px;
+    }
+    .step{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:16px;
+      background:#fff;
+      min-height:120px;
+      position:relative;
+      box-shadow:0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.03);
+      transition: box-shadow .2s ease, transform .2s ease;
+    }
+    .step:hover{ box-shadow:0 2px 6px rgba(0,0,0,.06), 0 6px 16px rgba(0,0,0,.05); transform:translateY(-2px); }
+    .step .n{
+      position:absolute; top:12px; right:12px;
+      font-size:18px; font-weight:800; color:rgba(0,0,0,.08);
+    }
+    .step h3{ margin:0 0 6px; font-size:14px; font-weight:700; }
+    .step p{ margin:0; color:var(--muted); font-size:12px; line-height:1.5; }
+    .callout{
+      border-left:4px solid var(--accent);
+      background:var(--accent-light);
+      padding:14px 16px;
+      border-radius:var(--radius);
+    }
+    .twoCol{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:12px; }
+    @media(max-width:900px){
+      .span-8,.span-6,.span-4{ grid-column:span 12; }
+      .flow{ grid-template-columns: 1fr; }
+      .twoCol{ grid-template-columns: 1fr; }
+      .kpi{ flex-direction:column; }
+    }
+    @media print{
+      body{ background:#fff; padding:0; }
+      .wrap{ margin:0; padding:16mm; max-width:none; }
+      .card,.step,table{ break-inside: avoid; box-shadow:none; }
+      .card:hover,.step:hover{ box-shadow:none; transform:none; }
+      header{ break-after: avoid; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Custom Solution Intake & Review — Executive Process Overview</h1>
+      <div class="sub">
+        A lightweight governance process to ensure custom solutions (AI, automation, analytics, digital products) are delivered with the
+        right level of assurance. The aim is to <b>move fast on low-risk work</b> while ensuring <b>higher-risk work</b> gets the right
+        cross-functional scrutiny (privacy, security, legal, operational accountability, and where applicable, AI governance).
+      </div>
+      <div class="pillrow">
+        <span class="pill">Outcome: clear routing + accountability</span>
+        <span class="pill">Principle: minimum necessary review</span>
+        <span class="pill">Inputs: structured intake (dropdowns)</span>
+        <span class="pill">Outputs: decision + constraints + worklist</span>
+      </div>
+    </header>
+
+    <section class="grid">
+      <div class="card span-12 soft">
+        <h2>Why this process exists</h2>
+        <div class="twoCol">
+          <div>
+            <p class="muted">
+              Custom solutions vary widely in risk based on what they do, what data they touch, who operates them, and the context they run in.
+              Without a consistent intake, teams either over-rotate (slow) or under-review (risk exposure).
+            </p>
+            <ul class="muted">
+              <li><b>Speed:</b> fast path for bounded low-risk solutions.</li>
+              <li><b>Consistency:</b> standard questions that drive consistent decisions.</li>
+              <li><b>Accountability:</b> clear owners, approvals, and decision records.</li>
+              <li><b>Defensibility:</b> demonstrable rationale for why the chosen review path was appropriate.</li>
+            </ul>
+          </div>
+          <div class="callout">
+            <p style="margin:0;">
+              <b>Design principle:</b> we do not "re-review everything." We identify which incremental obligations are triggered by the specific
+              solution and run only the reviews that are actually required.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-12">
+        <h2>Process at a glance (5 steps)</h2>
+        <div class="flow">
+          <div class="step">
+            <div class="n">1</div>
+            <h3>Intake</h3>
+            <p>Capture minimal structured inputs (what it does, data, hosting/ops, context, system impact).</p>
+          </div>
+          <div class="step">
+            <div class="n">2</div>
+            <h3>Triage</h3>
+            <p>Auto-route using decision rules; flag red-lines that require high assurance.</p>
+          </div>
+          <div class="step">
+            <div class="n">3</div>
+            <h3>Activation check</h3>
+            <p>Derive which incremental reviews are triggered (privacy, security, legal, ops, AI governance).</p>
+          </div>
+          <div class="step">
+            <div class="n">4</div>
+            <h3>Evidence pack</h3>
+            <p>Assemble only the artifacts required for the selected option (short pack vs full pack).</p>
+          </div>
+          <div class="step">
+            <div class="n">5</div>
+            <h3>Decision & record</h3>
+            <p>Approve, approve with constraints, or stop. Record decision and conditions for delivery.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-12">
+        <h2>Processing options (what leadership should expect)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:20%;">Option</th>
+              <th style="width:36%;">When it's used</th>
+              <th style="width:22%;">Typical SLA</th>
+              <th>Minimum outputs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b class="lane-good">Option A — Rapid Triage</b></td>
+              <td>Bounded, client-operated; guidance/advisory; read-only; non-sensitive data; low public-interest context.</td>
+              <td>1–2 business days</td>
+              <td>Routing decision + basic constraints + minimal evidence (intake summary).</td>
+            </tr>
+            <tr>
+              <td><b class="lane-warn">Option B — Standard Intake</b></td>
+              <td>Regulated contexts, personal data, provider-hosted pilots, gated actions, or meaningful workflow/system impact.</td>
+              <td>~5 business days to decision (typical)</td>
+              <td>Decision + triggered worklist + short Evidence Pack (data map, hosting boundary, oversight model).</td>
+            </tr>
+            <tr>
+              <td><b class="lane-bad">Option C — Full Proposal</b></td>
+              <td>Government/critical, managed service, persistent provider operation, automatic decisions, write/execute in core systems.</td>
+              <td>2–6+ weeks (scope dependent)</td>
+              <td>Formal approvals + full Evidence Pack + risk acceptance (where required) + operating model.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="muted" style="margin-top:10px;">
+          The process is designed to keep <b>Option C</b> rare and intentional. Most work should land in <b>A</b> or <b>B</b> if scoped properly.
+        </p>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-8">
+        <h2>What drives routing (the six risk drivers)</h2>
+        <table>
+          <thead>
+            <tr><th style="width:30%;">Driver</th><th>Executive definition</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><b>Decision role</b></td><td>Is it advising humans, taking actions with human gates, or acting automatically?</td></tr>
+            <tr><td><b>Human involvement</b></td><td>Do humans review every case, exceptions only, or not routinely?</td></tr>
+            <tr><td><b>Operations model</b></td><td>Who operates it day-to-day (client vs provider), and is it persistent or a pilot?</td></tr>
+            <tr><td><b>Data type</b></td><td>Test/business data vs personal data vs sensitive/regulated data.</td></tr>
+            <tr><td><b>Context</b></td><td>Commercial vs regulated vs government/critical environments.</td></tr>
+            <tr><td><b>System impact</b></td><td>Read-only vs updates to workflows/documents vs writes/executes in core systems.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card span-4 soft">
+        <h2>Hard escalations (non-negotiable)</h2>
+        <p class="muted">Any of these automatically requires <b>Option C — Full Proposal</b> (or an explicit executive override):</p>
+        <ul class="muted">
+          <li>Government/critical + sensitive/regulated data</li>
+          <li>Managed service + personal/sensitive data</li>
+          <li>Provider hosting + write/execute access to core systems</li>
+          <li>Automatic actions in regulated/public-interest contexts</li>
+          <li>No routine human review + write/execute capability</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-12">
+        <h2>What leadership gets at the end (decision package)</h2>
+        <div class="kpi">
+          <div class="box">
+            <div class="k">Decision</div>
+            <div class="v">Proceed / Proceed with constraints / Stop</div>
+            <div class="muted" style="margin-top:6px;">Clear outcome with rationale.</div>
+          </div>
+          <div class="box">
+            <div class="k">Constraints</div>
+            <div class="v">Hosting, data limits, autonomy limits</div>
+            <div class="muted" style="margin-top:6px;">What must be true for delivery to proceed.</div>
+          </div>
+          <div class="box">
+            <div class="k">Triggered reviews</div>
+            <div class="v">Auto-derived worklist</div>
+            <div class="muted" style="margin-top:6px;">Privacy/security/legal/ops/AI governance as applicable.</div>
+          </div>
+          <div class="box">
+            <div class="k">Record</div>
+            <div class="v">Decision log + owner</div>
+            <div class="muted" style="margin-top:6px;">Defensible trail for internal/external scrutiny.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-6">
+        <h2>Governance (lightweight)</h2>
+        <table>
+          <thead><tr><th style="width:32%;">Role</th><th>Accountability</th></tr></thead>
+          <tbody>
+            <tr><td><b>Submitter</b></td><td>Provides accurate intake details and confirms scope boundaries.</td></tr>
+            <tr><td><b>Solution owner</b></td><td>Owns the technical/design response and evidence pack.</td></tr>
+            <tr><td><b>Risk reviewers</b></td><td>Provide approvals only when triggered (privacy, security, legal, etc.).</td></tr>
+            <tr><td><b>Decision owner</b></td><td>Confirms lane decision and constraints; escalates where needed.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card span-6 soft">
+        <h2>Metrics to keep it honest</h2>
+        <ul class="muted">
+          <li><b>Time to triage</b> (Option A): target 1–2 business days</li>
+          <li><b>Time to decision</b> (Option B): target ~5 business days (typical)</li>
+          <li><b>% routed to Option C</b>: should remain low and explainable</li>
+          <li><b>Rework rate</b>: intakes returned for missing info (signals form clarity issues)</li>
+          <li><b>Post-deployment incidents</b>: validate whether routing logic is calibrated</li>
+        </ul>
+        <p class="muted" style="margin-top:8px;">
+          After ~30–60 intakes, tune the thresholds and hard flags based on observed outcomes.
+        </p>
+      </div>
+    </section>
+
+    <footer class="muted" style="margin-top:16px;">
+      Version: Executive Overview v1.0 — Platform-agnostic Intake / Review / Processing
+    </footer>
+  </div>
+</body>
+</html>

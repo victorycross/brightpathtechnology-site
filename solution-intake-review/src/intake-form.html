@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Custom Solution Intake — Review & Processing</title>
+<style>
+  :root{
+    --bg:#f8f9fb; --ink:#1a1d23; --muted:#6b7280; --line:#e2e5ea; --soft:#f1f3f6;
+    --good:#059669; --good-bg:#ecfdf5; --warn:#d97706; --warn-bg:#fffbeb; --bad:#dc2626; --bad-bg:#fef2f2;
+    --card:#ffffff; --accent:#4f46e5; --accent-light:#eef2ff; --radius:14px;
+  }
+  *{ box-sizing:border-box; }
+  body{ font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; margin:0; padding:24px; color:var(--ink); background:var(--bg); line-height:1.5; -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:1180px; margin:0 auto; }
+  header{ margin-bottom:20px; }
+  h1{ margin:0; font-size:22px; font-weight:800; letter-spacing:-0.02em; }
+  h2{ font-size:16px; font-weight:700; letter-spacing:-0.01em; }
+  h3{ font-size:14px; font-weight:700; letter-spacing:-0.01em; }
+  .lead{ color:var(--muted); margin:8px 0 14px; max-width:110ch; font-size:14px; line-height:1.6; }
+  .grid{ display:grid; grid-template-columns: 1fr 400px; gap:24px; align-items:start; }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:20px; box-shadow:0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.03); transition: box-shadow .2s ease; }
+  .card:hover{ box-shadow:0 1px 3px rgba(0,0,0,.06), 0 6px 16px rgba(0,0,0,.05); }
+  label{ display:block; font-weight:700; font-size:12px; margin:14px 0 6px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); }
+  select,input[type="text"],textarea{ width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:14px; background:#fff; color:var(--ink); transition: border-color .15s ease, box-shadow .15s ease; outline:none; font-family:inherit; }
+  select:hover,input[type="text"]:hover,textarea:hover{ border-color:#c7cbd1; }
+  select:focus,input[type="text"]:focus,textarea:focus{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-light); }
+  textarea{ min-height:80px; resize:vertical; line-height:1.5; }
+  select{ cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5l3 3 3-3'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .btn{ padding:10px 18px; border-radius:10px; border:1px solid var(--line); cursor:pointer; background:#fff; font-size:13px; font-weight:600; font-family:inherit; transition: all .15s ease; }
+  .btn:hover{ background:var(--soft); border-color:#c7cbd1; }
+  .btn:active{ transform:scale(.98); }
+  .btn.primary{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .btn.primary:hover{ background:#2d3039; box-shadow:0 2px 8px rgba(0,0,0,.15); }
+  .btn.primary:active{ background:#111; }
+  .muted{ color:var(--muted); }
+  .small{ font-size:12px; color:var(--muted); line-height:1.5; }
+  .hr{ height:1px; background:var(--line); margin:16px 0; }
+  .kpi{ display:flex; gap:12px; flex-wrap:wrap; margin-top:12px; }
+  .kpi .item{ border:1px solid var(--line); padding:14px 16px; border-radius:12px; min-width:180px; flex:1; background:#fff; transition: box-shadow .15s ease; }
+  .kpi .item:hover{ box-shadow:0 2px 8px rgba(0,0,0,.06); }
+  .kpi .k{ font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.04em; }
+  .kpi .v{ font-size:17px; font-weight:800; margin-top:6px; letter-spacing:-0.01em; }
+  table{ width:100%; border-collapse:separate; border-spacing:0; margin-top:10px; font-size:13px; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  th,td{ border-bottom:1px solid var(--line); padding:10px 12px; text-align:left; vertical-align:top; }
+  tr:last-child td{ border-bottom:none; }
+  th{ background:var(--soft); font-weight:700; color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:0.04em; }
+  tbody tr{ transition: background .1s ease; }
+  tbody tr:hover{ background:var(--soft); }
+  .lane-good{ color:var(--good); font-weight:800; }
+  .lane-warn{ color:var(--warn); font-weight:800; }
+  .lane-bad{ color:var(--bad); font-weight:800; }
+  details summary{ cursor:pointer; font-weight:700; padding:10px 0; font-size:13px; color:var(--muted); transition:color .15s ease; }
+  details summary:hover{ color:var(--ink); }
+  .pill{ display:inline-block; padding:5px 12px; border:1px solid var(--line); border-radius:999px; background:#fff; font-size:12px; color:var(--muted); font-weight:600; transition: all .15s ease; }
+  .pill:hover{ background:var(--accent-light); border-color:var(--accent); color:var(--accent); }
+  .list{ margin:8px 0 0 18px; line-height:1.7; }
+  .hidden{ display:none; }
+  @media(max-width:980px){ .grid{ grid-template-columns:1fr; } .kpi{ flex-direction:column; } }
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <header>
+    <h1>Custom Solution Intake — Review & Processing</h1>
+    <div class="lead">
+      A platform-agnostic intake process for custom solutions (AI, automation, analytics, digital products). Capture minimal structured information,
+      automatically route to the right review lane, and generate a worklist of incremental reviews and required artifacts.
+    </div>
+    <div class="row">
+      <span class="pill">Option A: Rapid Triage</span>
+      <span class="pill">Option B: Standard Intake</span>
+      <span class="pill">Option C: Full Proposal</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="card" aria-label="Intake form">
+      <h2 style="margin:0 0 6px;">1) Minimal Intake Form</h2>
+      <div class="small">Answer the questions below. The system recommends a processing option and lists required incremental reviews.</div>
+
+      <label>Engagement / initiative name</label>
+      <input id="eng" type="text" placeholder="e.g., ClientX — Procedure Guidance Automation" />
+
+      <label>Client / business unit</label>
+      <input id="client" type="text" placeholder="Client name + BU" />
+
+      <label>One-sentence description (what is being built?)</label>
+      <textarea id="desc" placeholder="Example: A workflow assistant that retrieves procedures and guides staff through compliant execution with an audit trail."></textarea>
+
+      <div class="hr"></div>
+      <h3 style="margin:0 0 6px;">Core classification (6 questions)</h3>
+
+      <label>1) What role does the solution play?</label>
+      <select id="role" onchange="recompute()">
+        <option value="">Select…</option>
+        <option value="advice">Provides guidance / recommendations (humans decide)</option>
+        <option value="gated">Takes actions with human approval gates</option>
+        <option value="auto">Acts automatically (no routine human approval)</option>
+      </select>
+
+      <label>2) How are humans involved?</label>
+      <select id="humans" onchange="recompute()">
+        <option value="">Select…</option>
+        <option value="every">Human reviews every case</option>
+        <option value="exceptions">Human reviews exceptions only</option>
+        <option value="none">No routine human review</option>
+      </select>
+
+      <label>3) Who runs and operates it?</label>
+      <select id="ops" onchange="recompute()">
+        <option value="">Select…</option>
+        <option value="client">Client runs it (client-operated)</option>
+        <option value="vendor_pilot">Provider hosts for a limited pilot</option>
+        <option value="vendor_ongoing">Provider hosts for ongoing use</option>
+        <option value="managed">Provider runs it as a managed service</option>
+      </select>
+
+      <label>4) What kind of data is used?</label>
+      <select id="data" onchange="recompute()">
+        <option value="">Select…</option>
+        <option value="test">Test / anonymized only</option>
+        <option value="business">Business data (no personal data)</option>
+        <option value="personal">Personal data (PII)</option>
+        <option value="sensitive">Sensitive / regulated (AML, health, classified)</option>
+      </select>
+
+      <label>5) What is the operating context?</label>
+      <select id="context" onchange="recompute()">
+        <option value="">Select…</option>
+        <option value="commercial">Commercial (non-regulated)</option>
+        <option value="regulated">Regulated industry (e.g., financial services)</option>
+        <option value="government">Government / public sector</option>
+        <option value="critical">Critical infrastructure / national interest</option>
+      </select>
+
+      <label>6) What can it change?</label>
+      <select id="impact" onchange="recompute()">
+        <option value="">Select…</option>
+        <option value="read">Reads only</option>
+        <option value="update">Updates cases/documents/workflow artifacts</option>
+        <option value="write">Writes/executes changes in core systems</option>
+      </select>
+
+      <div id="followData" class="hidden">
+        <div class="hr"></div>
+        <h3 style="margin:0 0 6px;">Data follow-ups</h3>
+
+        <label>Cross-border data movement?</label>
+        <select id="xborder" onchange="recompute()">
+          <option value="">Select…</option>
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+          <option value="unknown">Not sure</option>
+        </select>
+
+        <label>Long-term retention?</label>
+        <select id="retain" onchange="recompute()">
+          <option value="">Select…</option>
+          <option value="no">No (ephemeral)</option>
+          <option value="yes">Yes</option>
+          <option value="unknown">Not sure</option>
+        </select>
+
+        <label>Is client data used to train or improve models?</label>
+        <select id="train" onchange="recompute()">
+          <option value="">Select…</option>
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+          <option value="unknown">Not sure</option>
+        </select>
+      </div>
+
+      <div id="followOps" class="hidden">
+        <div class="hr"></div>
+        <h3 style="margin:0 0 6px;">Operations follow-ups</h3>
+
+        <label>24/7 availability expected?</label>
+        <select id="avail" onchange="recompute()">
+          <option value="">Select…</option>
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+          <option value="unknown">Not sure</option>
+        </select>
+
+        <label>SLAs contractually defined?</label>
+        <select id="sla" onchange="recompute()">
+          <option value="">Select…</option>
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+          <option value="unknown">Not sure</option>
+        </select>
+      </div>
+
+      <div class="hr"></div>
+      <div class="row">
+        <button class="btn" onclick="clearForm()">Clear</button>
+        <button class="btn primary" onclick="submitIntake()">Submit for consideration</button>
+      </div>
+
+      <div class="hr"></div>
+
+      <h2 style="margin:0 0 6px;">2) Intake result (live)</h2>
+      <div class="kpi">
+        <div class="item">
+          <div class="k">Recommended option</div>
+          <div id="recOption" class="v">—</div>
+          <div id="recOptionClass" class="small"></div>
+        </div>
+        <div class="item">
+          <div class="k">Why</div>
+          <div id="recWhy" class="small">—</div>
+        </div>
+        <div class="item">
+          <div class="k">Immediate next actions</div>
+          <div id="recActions" class="small">—</div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+      <h3 style="margin:0 0 6px;">Triggered incremental reviews (auto-derived)</h3>
+      <table>
+        <thead><tr><th style="width:34%;">Review</th><th style="width:12%;">Triggered?</th><th>Reason</th></tr></thead>
+        <tbody id="worklist"></tbody>
+      </table>
+
+      <details style="margin-top:10px;">
+        <summary>How routing works</summary>
+        <div class="small muted">
+          Hard escalation flags force Option C. Otherwise Option B is selected when personal data, provider hosting, regulated contexts,
+          or non-trivial system impact exists. Option A is reserved for bounded, low-risk, client-operated solutions.
+        </div>
+      </details>
+    </section>
+
+    <aside class="card" aria-label="Options and processing">
+      <h2 style="margin:0 0 6px;">3) Processing options (for consideration)</h2>
+      <div class="small muted">Use these as a menu of rigor levels. The intake engine recommends one.</div>
+
+      <div class="hr"></div>
+
+      <h3>Option A — Rapid Triage</h3>
+      <div class="small muted">
+        <b>Goal:</b> fast feasibility + deal hygiene + pattern match. <br/>
+        <b>Best for:</b> client-operated, advice-only, reads-only, non-sensitive.
+      </div>
+      <table>
+        <tr><th>Target SLA</th><td>1–2 business days</td></tr>
+        <tr><th>Artifacts</th><td>Intake form + 1-page summary (auto-generated)</td></tr>
+        <tr><th>Decision</th><td>Pre-cleared or escalate to Option B/C</td></tr>
+      </table>
+
+      <div class="hr"></div>
+
+      <h3>Option B — Standard Intake</h3>
+      <div class="small muted">
+        <b>Goal:</b> scoped delta reviews + short Evidence Pack. <br/>
+        <b>Best for:</b> regulated pilots, personal data, limited provider hosting, gated actions.
+      </div>
+      <table>
+        <tr><th>Target SLA</th><td>5 business days to decision</td></tr>
+        <tr><th>Artifacts</th><td>Short Evidence Pack: data map, hosting boundary, oversight model, controls summary</td></tr>
+        <tr><th>Decision</th><td>Proceed with constraints, or escalate to Option C</td></tr>
+      </table>
+
+      <div class="hr"></div>
+
+      <h3>Option C — Full Proposal</h3>
+      <div class="small muted">
+        <b>Goal:</b> high assurance for production-grade or provider-run solutions. <br/>
+        <b>Best for:</b> government/critical, managed service, automatic decisions, write/execute in core systems.
+      </div>
+      <table>
+        <tr><th>Target SLA</th><td>2–6+ weeks depending on scope</td></tr>
+        <tr><th>Artifacts</th><td>Full Evidence Pack: architecture, resilience, governance, contracts, runbook, risk acceptance</td></tr>
+        <tr><th>Decision</th><td>Formal approvals + recorded acceptance + operating constraints</td></tr>
+      </table>
+
+      <div class="hr"></div>
+
+      <h3>Typical workstreams by review</h3>
+      <ul class="list small muted">
+        <li><b>Security/Architecture:</b> boundary, access controls, threat model, logging</li>
+        <li><b>Privacy/Data Protection:</b> data roles, DPIA, residency/transfer, retention</li>
+        <li><b>AI Governance:</b> autonomy limits, explainability, monitoring/drift, training</li>
+        <li><b>Contract/Legal:</b> liability, SLAs, permitted use, audit rights, subcontractors</li>
+        <li><b>Ops/Resilience:</b> incident response, change control, DR, support model</li>
+      </ul>
+    </aside>
+  </div>
+</div>
+
+<script>
+  function $(id){ return document.getElementById(id); }
+  function v(id){ return $(id) ? $(id).value : ""; }
+  function setText(id, text){ $(id).textContent = text; }
+
+  const scoreMap = {
+    role: { advice:0, gated:10, auto:25 },
+    humans:{ every:0, exceptions:8, none:20 },
+    ops:   { client:0, vendor_pilot:10, vendor_ongoing:22, managed:28 },
+    data:  { test:0, business:12, personal:20, sensitive:28 },
+    context:{ commercial:0, regulated:15, government:24, critical:30 },
+    impact:{ read:0, update:8, write:18 },
+    xborder:{ no:0, yes:10, unknown:6 },
+    retain:{ no:0, yes:6, unknown:4 },
+    train: { no:0, yes:18, unknown:8 },
+    avail: { no:0, yes:6, unknown:3 },
+    sla:   { no:0, yes:6, unknown:3 }
+  };
+
+  function scoreOne(key, val){
+    if(!val) return 0;
+    const m = scoreMap[key];
+    return m && typeof m[val] !== "undefined" ? m[val] : 0;
+  }
+
+  function normalize(raw){
+    const ceiling = 165;
+    return Math.max(0, Math.min(100, Math.round((raw / ceiling) * 100)));
+  }
+
+  function hardFlags(){
+    const flags = [];
+    const ctx = v("context");
+    const data = v("data");
+    const ops  = v("ops");
+    const role = v("role");
+    const impact = v("impact");
+    const humans = v("humans");
+
+    if((ctx === "government" || ctx === "critical") && data === "sensitive"){
+      flags.push("Public-interest context + sensitive/regulated data");
+    }
+    if(ops === "managed" && (data === "personal" || data === "sensitive")){
+      flags.push("Managed service + personal/sensitive data");
+    }
+    if(impact === "write" && ops !== "client"){
+      flags.push("Provider hosting + write/execute in core systems");
+    }
+    if(role === "auto" && ctx && ctx !== "commercial"){
+      flags.push("Automatic actions in regulated/public-interest context");
+    }
+    if(humans === "none" && impact === "write"){
+      flags.push("No routine human review + write/execute capability");
+    }
+    return flags;
+  }
+
+  function deriveOption(score, flags){
+    if(flags.length) return { option:"Option C — Full Proposal", cls:"lane-bad", why:"Hard escalation: " + flags.join("; ") };
+    if(score >= 60) return { option:"Option C — Full Proposal", cls:"lane-bad", why:"High overall activation (score >= 60)" };
+    if(score >= 25) return { option:"Option B — Standard Intake", cls:"lane-warn", why:"Targeted scoping needed (score 25-59)" };
+    return { option:"Option A — Rapid Triage", cls:"lane-good", why:"Low incremental risk indicators (score < 25)" };
+  }
+
+  function computeWorklist(){
+    const items = [];
+    const reasons = {};
+
+    const role = v("role");
+    const humans = v("humans");
+    const ops = v("ops");
+    const data = v("data");
+    const ctx = v("context");
+    const impact = v("impact");
+
+    if(ops !== "client" || impact !== "read"){
+      items.push("Security / architecture review");
+      reasons["Security / architecture review"] = "Provider hosting and/or non-trivial system impact.";
+    }
+    if(data === "personal" || data === "sensitive"){
+      items.push("Privacy / data protection review");
+      reasons["Privacy / data protection review"] = "Personal or sensitive/regulated data in scope.";
+    }
+    if(v("xborder") === "yes" || v("xborder") === "unknown"){
+      items.push("Residency / cross-border assessment");
+      reasons["Residency / cross-border assessment"] = "Cross-border movement is yes/unknown.";
+    }
+    if(role === "auto" || humans === "none" || v("train") === "yes" || data === "sensitive"){
+      items.push("AI governance / autonomy controls");
+      reasons["AI governance / autonomy controls"] = "Higher autonomy, limited oversight, training, or sensitive data increases governance needs.";
+    }
+    if(ops !== "client" || v("sla") === "yes" || v("avail") === "yes"){
+      items.push("Contract / legal positioning");
+      reasons["Contract / legal positioning"] = "Hosting/SLAs/availability expectations affect liability and terms.";
+    }
+    if(ops === "vendor_ongoing" || ops === "managed"){
+      items.push("Operations & resilience model");
+      reasons["Operations & resilience model"] = "Ongoing hosting/operation requires monitoring, IR, change control, DR/BCP.";
+    }
+    if(ctx === "regulated" || ctx === "government" || ctx === "critical"){
+      items.push("Regulatory / sector clearance");
+      reasons["Regulatory / sector clearance"] = "Regulated or public-interest context requires enhanced scrutiny.";
+    }
+    if(impact === "write"){
+      items.push("Change / execution control design");
+      reasons["Change / execution control design"] = "Write/execute capability increases blast radius.";
+    }
+
+    const dedup = [];
+    items.forEach(i => { if(!dedup.includes(i)) dedup.push(i); });
+    return { list: dedup, reasons };
+  }
+
+  function renderWorklist(w){
+    const rows = [
+      "Security / architecture review",
+      "Privacy / data protection review",
+      "Residency / cross-border assessment",
+      "AI governance / autonomy controls",
+      "Contract / legal positioning",
+      "Operations & resilience model",
+      "Regulatory / sector clearance",
+      "Change / execution control design"
+    ];
+    const tbody = $("worklist");
+    tbody.innerHTML = "";
+    rows.forEach(name => {
+      const hit = w.list.includes(name);
+      const why = hit ? w.reasons[name] : "Not triggered by current selections.";
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td><strong>${name}</strong></td><td>${hit ? "Yes" : "No"}</td><td>${why}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function recompute(){
+    const data = v("data");
+    const ops = v("ops");
+    const showData = (data === "personal" || data === "sensitive");
+    const showOps  = (ops === "vendor_ongoing" || ops === "managed");
+    $("followData").classList.toggle("hidden", !showData);
+    $("followOps").classList.toggle("hidden", !showOps);
+
+    let raw = 0;
+    raw += scoreOne("role", v("role"));
+    raw += scoreOne("humans", v("humans"));
+    raw += scoreOne("ops", v("ops"));
+    raw += scoreOne("data", v("data"));
+    raw += scoreOne("context", v("context"));
+    raw += scoreOne("impact", v("impact"));
+
+    if(showData){
+      raw += scoreOne("xborder", v("xborder"));
+      raw += scoreOne("retain", v("retain"));
+      raw += scoreOne("train", v("train"));
+    }
+    if(showOps){
+      raw += scoreOne("avail", v("avail"));
+      raw += scoreOne("sla", v("sla"));
+    }
+
+    const score = normalize(raw);
+    const flags = hardFlags();
+    const rec = deriveOption(score, flags);
+
+    const recEl = $("recOption");
+    recEl.textContent = rec.option;
+    recEl.className = "v " + rec.cls;
+    setText("recWhy", rec.why);
+
+    const actions = [];
+    if(rec.option.includes("Option A")){
+      actions.push("Confirm scope boundaries and precedent/pattern match (if any)");
+      actions.push("Create a short 1-page summary and proceed, unless new flags emerge");
+    } else if(rec.option.includes("Option B")){
+      actions.push("Prepare short Evidence Pack: data map, hosting boundary, oversight model");
+      actions.push("Engage targeted reviewers (privacy/security/AI governance/contract as triggered)");
+    } else {
+      actions.push("Prepare full Evidence Pack (architecture, resilience, governance, runbook, contract terms)");
+      actions.push("Schedule cross-domain review and record approval/risk acceptance");
+    }
+    setText("recActions", actions.join(" • "));
+
+    const w = computeWorklist();
+    renderWorklist(w);
+  }
+
+  function clearForm(){
+    ["eng","client","desc","role","humans","ops","data","context","impact","xborder","retain","train","avail","sla"].forEach(id=>{
+      const el = $(id);
+      if(!el) return;
+      el.value = "";
+    });
+    recompute();
+  }
+
+  function submitIntake(){
+    const eng = v("eng").trim();
+    const client = v("client").trim();
+    const desc = v("desc").trim();
+    if(!eng || !client || !desc){
+      alert("Please complete: Engagement/initiative name, Client/BU, and description.");
+      return;
+    }
+    alert("Submitted for consideration (prototype). Recommended: " + $("recOption").textContent);
+  }
+
+  recompute();
+</script>
+</body>
+</html>

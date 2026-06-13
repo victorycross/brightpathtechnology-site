@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solution Intake &amp; Review — Governance Triage | BrightPath Technologies</title>
+  <meta name="description" content="A governance triage tool that routes custom solutions to the right review lane based on weighted risk scoring and hard escalation rules.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1f6e1;</text></svg>">
+<style>
+  :root {
+    --brand-deep: #0f172a;
+    --brand-dark: #1e293b;
+    --brand-mid: #334155;
+    --brand-slate: #64748b;
+    --brand-light: #94a3b8;
+    --brand-pale: #e2e8f0;
+    --brand-white: #f8fafc;
+    --accent-primary: #3b82f6;
+    --accent-hover: #2563eb;
+    --accent-subtle: #dbeafe;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+    --transition: 0.2s ease;
+    --max-width: 1200px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--brand-dark);
+    background: var(--brand-white);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 { font-weight: 700; line-height: 1.2; color: var(--brand-deep); }
+  h1 { font-size: 3rem; letter-spacing: -0.03em; }
+  h2 { font-size: 2rem; letter-spacing: -0.02em; }
+  h3 { font-size: 1.25rem; }
+  p { color: var(--brand-mid); max-width: 680px; }
+  a { color: var(--accent-primary); text-decoration: none; transition: color var(--transition); }
+  a:hover { color: var(--accent-hover); }
+
+  .container { max-width: var(--max-width); margin: 0 auto; padding: 0 2rem; }
+  section { padding: 6rem 0; }
+
+  .section-label {
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent-primary); margin-bottom: 0.75rem;
+  }
+
+  .section-title { margin-bottom: 1rem; }
+  .section-subtitle { font-size: 1.125rem; margin-bottom: 3rem; }
+
+  .highlight { color: var(--accent-primary); }
+
+  /* ── Navigation ── */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(248,250,252,0.9);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--brand-pale);
+    padding: 1rem 0;
+  }
+
+  .nav-inner {
+    max-width: var(--max-width); margin: 0 auto; padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .nav-brand {
+    font-weight: 700; font-size: 1.05rem; color: var(--brand-deep);
+    text-decoration: none; display: flex; align-items: center; gap: 0.5rem;
+  }
+
+  .nav-brand span { font-weight: 400; color: var(--brand-slate); }
+
+  .brand-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent-primary); flex-shrink: 0;
+  }
+
+  .nav-links {
+    display: flex; list-style: none; gap: 2rem; align-items: center;
+  }
+
+  .nav-links a {
+    font-size: 0.875rem; font-weight: 500; color: var(--brand-slate);
+    text-decoration: none; transition: color var(--transition);
+  }
+
+  .nav-links a:hover { color: var(--brand-deep); }
+
+  /* ── Hero ── */
+  .hero {
+    background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 50%, #f5f3ff 100%);
+    padding: 6rem 0; border-bottom: 1px solid var(--brand-pale);
+  }
+
+  .hero-content { max-width: 800px; }
+  .hero-content h1 { margin-bottom: 1.5rem; }
+  .hero-content p { font-size: 1.25rem; line-height: 1.7; margin-bottom: 2.5rem; }
+
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.875rem 1.75rem; border-radius: var(--radius-md);
+    font-weight: 600; font-size: 0.95rem; transition: all var(--transition);
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: var(--accent-primary); color: white;
+    box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-hover); color: white;
+    box-shadow: 0 4px 16px rgba(59,130,246,0.4); transform: translateY(-1px);
+  }
+
+  /* ── Problem cards ── */
+  .problem { background: white; }
+
+  .problem-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;
+  }
+
+  .problem-card {
+    padding: 2rem; border-radius: var(--radius-lg);
+    border: 1px solid var(--brand-pale); background: var(--brand-white);
+    transition: all var(--transition);
+  }
+
+  .problem-card:hover {
+    border-color: var(--accent-subtle); box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .problem-card .card-icon {
+    font-size: 1.5rem; margin-bottom: 1rem;
+    width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+    background: var(--accent-subtle); border-radius: var(--radius-md);
+  }
+
+  .problem-card h3 { margin-bottom: 0.75rem; }
+  .problem-card p { font-size: 0.9375rem; }
+
+  /* ── How it works (stages) ── */
+  .how-it-works { background: var(--brand-white); }
+
+  .stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+
+  .stage {
+    padding: 2rem; border-radius: var(--radius-lg);
+    background: white; border: 1px solid var(--brand-pale);
+  }
+
+  .stage-number {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--accent-primary); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1.125rem; margin-bottom: 1.25rem;
+  }
+
+  .stage h3 { margin-bottom: 0.75rem; }
+  .stage p { font-size: 0.9375rem; margin-bottom: 1.25rem; }
+
+  .stage-features {
+    list-style: none; display: flex; flex-direction: column; gap: 0.5rem;
+  }
+
+  .stage-features li {
+    font-size: 0.8125rem; color: var(--brand-slate);
+    padding-left: 1.25rem; position: relative;
+  }
+
+  .stage-features li::before {
+    content: ''; position: absolute; left: 0; top: 0.5em;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent-primary);
+  }
+
+  /* ── Launch tools section ── */
+  .tools-section { background: white; }
+
+  .tools-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; max-width: 800px;
+  }
+
+  .tool-card {
+    display: flex; flex-direction: column; padding: 2rem;
+    border-radius: var(--radius-lg); border: 1px solid var(--brand-pale);
+    background: var(--brand-white); text-decoration: none; color: inherit;
+    transition: all var(--transition);
+  }
+
+  .tool-card:hover {
+    border-color: var(--accent-primary); box-shadow: var(--shadow-md);
+    transform: translateY(-2px); color: inherit;
+  }
+
+  .tool-card h3 { margin-bottom: 0.5rem; color: var(--brand-deep); }
+  .tool-card p { font-size: 0.9375rem; flex: 1; }
+
+  .tool-card .card-arrow {
+    margin-top: 1.25rem; display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.8125rem; font-weight: 600; color: var(--accent-primary);
+  }
+
+  /* ── Footer ── */
+  .footer {
+    background: var(--brand-deep); color: var(--brand-light); padding: 3rem 0;
+  }
+
+  .footer-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem;
+  }
+
+  .footer-brand { font-weight: 700; font-size: 1rem; color: white; }
+  .footer-brand span { font-weight: 400; color: var(--brand-light); }
+
+  .footer-nav {
+    display: flex; align-items: center; gap: 1.25rem; list-style: none;
+  }
+
+  .footer-nav a {
+    font-size: 0.8125rem; color: var(--brand-light);
+    text-decoration: none; transition: color var(--transition);
+  }
+
+  .footer-nav a:hover { color: white; }
+
+  .footer-copy { font-size: 0.8125rem; color: var(--brand-slate); }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.5rem; }
+    section { padding: 3rem 0; }
+    .hero { padding: 3rem 0; }
+    .hero-content p { font-size: 1rem; }
+    .problem-grid, .stages, .tools-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .footer-inner { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ═══ Navigation ═══ -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-brand">
+        <span class="brand-dot"></span>
+        Solution Intake &amp; Review <span>by BrightPath</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#dimensions">Risk Dimensions</a></li>
+        <li><a href="#tools">Launch Tools</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ═══ Hero ═══ -->
+  <section class="hero">
+    <div class="container hero-content">
+      <h1>Route custom solutions to the <span class="highlight">right review lane</span></h1>
+      <p>A governance triage tool for AI, automation, analytics, and digital products. Weighted risk scoring and hard escalation rules ensure every solution gets the right level of scrutiny &mdash; no more, no less.</p>
+      <div class="hero-actions">
+        <a href="#how-it-works" class="btn btn-primary">See How It Works</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Problem ═══ -->
+  <section id="problem" class="problem">
+    <div class="container">
+      <div class="section-label">The Problem</div>
+      <h2 class="section-title">Custom solutions create governance blind spots</h2>
+      <p class="section-subtitle">When teams build or buy solutions outside standard channels, three risks compound quickly.</p>
+
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="card-icon">&#x1F50D;</div>
+          <h3>Inconsistent Triage</h3>
+          <p>Without a structured intake, similar solutions get wildly different levels of review. High-risk proposals slip through while low-risk ones get buried in committee.</p>
+        </div>
+        <div class="problem-card">
+          <div class="card-icon">&#x26A0;&#xFE0F;</div>
+          <h3>Invisible Risk Accumulation</h3>
+          <p>Each solution carries risk across multiple dimensions &mdash; data sensitivity, regulatory exposure, vendor dependency. Without scoring, the aggregate risk picture is invisible.</p>
+        </div>
+        <div class="problem-card">
+          <div class="card-icon">&#x23F3;</div>
+          <h3>Slow, Manual Routing</h3>
+          <p>Review committees waste time debating which lane a solution belongs in. Teams wait weeks for decisions that a structured framework could resolve in minutes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ How It Works ═══ -->
+  <section id="how-it-works" class="how-it-works">
+    <div class="container">
+      <div class="section-label">How It Works</div>
+      <h2 class="section-title">Three processing lanes, one consistent framework</h2>
+      <p class="section-subtitle">Every solution is scored and routed to the appropriate review lane based on risk, not opinion.</p>
+
+      <div class="stages">
+        <div class="stage">
+          <div class="stage-number">A</div>
+          <h3>Rapid Triage</h3>
+          <p>Low-risk solutions that fit within established guardrails. Approved with minimal documentation and fast-tracked for deployment.</p>
+          <ul class="stage-features">
+            <li>Weighted risk score below threshold</li>
+            <li>No hard escalation triggers</li>
+            <li>Standard evidence pack</li>
+            <li>SLA: 2 business days</li>
+          </ul>
+        </div>
+        <div class="stage">
+          <div class="stage-number">B</div>
+          <h3>Standard Intake</h3>
+          <p>Medium-risk solutions requiring review by subject matter experts. Structured assessment across all risk dimensions with documented rationale.</p>
+          <ul class="stage-features">
+            <li>Moderate risk score range</li>
+            <li>SME review required</li>
+            <li>Enhanced evidence pack</li>
+            <li>SLA: 5 business days</li>
+          </ul>
+        </div>
+        <div class="stage">
+          <div class="stage-number">C</div>
+          <h3>Full Proposal</h3>
+          <p>High-risk or complex solutions requiring committee review, executive sign-off, and comprehensive documentation before proceeding.</p>
+          <ul class="stage-features">
+            <li>High risk score or escalation trigger</li>
+            <li>Committee review required</li>
+            <li>Full evidence and impact analysis</li>
+            <li>SLA: 10 business days</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Risk Dimensions ═══ -->
+  <section id="dimensions" class="problem">
+    <div class="container">
+      <div class="section-label">Risk Dimensions</div>
+      <h2 class="section-title">Six dimensions that determine the review lane</h2>
+      <p class="section-subtitle">Each solution is scored across six weighted dimensions. Hard escalation rules override the weighted score when critical thresholds are breached.</p>
+
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="card-icon">&#x1F4CA;</div>
+          <h3>Data Sensitivity</h3>
+          <p>Classification of data the solution will access, process, or store &mdash; from public datasets to regulated personal information.</p>
+        </div>
+        <div class="problem-card">
+          <div class="card-icon">&#x2696;&#xFE0F;</div>
+          <h3>Regulatory Exposure</h3>
+          <p>Applicable regulatory frameworks, compliance obligations, and jurisdictional requirements that govern the solution.</p>
+        </div>
+        <div class="problem-card">
+          <div class="card-icon">&#x1F517;</div>
+          <h3>Vendor Dependency</h3>
+          <p>Degree of reliance on third-party vendors, lock-in risk, and the organisation&rsquo;s ability to switch or exit.</p>
+        </div>
+        <div class="problem-card">
+          <div class="card-icon">&#x1F6E1;&#xFE0F;</div>
+          <h3>Security Posture</h3>
+          <p>Authentication, authorisation, encryption, and network exposure requirements for the solution&rsquo;s deployment model.</p>
+        </div>
+        <div class="problem-card">
+          <div class="card-icon">&#x1F465;</div>
+          <h3>User Impact</h3>
+          <p>Number of users affected, criticality to business operations, and potential disruption if the solution fails or is unavailable.</p>
+        </div>
+        <div class="problem-card">
+          <div class="card-icon">&#x2699;&#xFE0F;</div>
+          <h3>Integration Complexity</h3>
+          <p>Touchpoints with existing systems, data flows, API dependencies, and the architectural footprint of the solution.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Launch Tools ═══ -->
+  <section id="tools" class="tools-section">
+    <div class="container">
+      <div class="section-label">Launch Tools</div>
+      <h2 class="section-title">Start a review</h2>
+      <p class="section-subtitle">Use the intake form to classify and route a solution, or review the executive overview for process documentation.</p>
+
+      <div class="tools-grid">
+        <a class="tool-card" href="src/intake-form.html">
+          <h3>Intake Form</h3>
+          <p>Classify a solution across six risk dimensions, view the calculated risk score, recommended processing lane, and generated review worklist.</p>
+          <div class="card-arrow">Launch tool &rarr;</div>
+        </a>
+        <a class="tool-card" href="docs/process/executive-overview.html">
+          <h3>Executive Overview</h3>
+          <p>Read-only summary of the intake process, routing logic, SLA targets, and evidence-pack structure for stakeholders.</p>
+          <div class="card-arrow">View overview &rarr;</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Footer ═══ -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">Solution Intake &amp; Review <span>by BrightPath Technologies</span></div>
+      <nav class="footer-nav" aria-label="Legal">
+        <a href="https://advisors.brightpathtechnology.io/contact">Contact</a>
+        <a href="https://advisors.brightpathtechnology.io/privacy">Privacy Policy</a>
+        <a href="https://advisors.brightpathtechnology.io/terms">Terms of Use</a>
+      </nav>
+      <div class="footer-copy">&copy; 2026 BrightPath Technologies. Toronto, Ontario, Canada.</div>
+    </div>
+  </footer>
+
+</body>
+</html>
